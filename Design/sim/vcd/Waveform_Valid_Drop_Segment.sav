@@ -1,0 +1,50 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu May  8 06:04:37 2025
+[*]
+[dumpfile] "/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/vcd/valid_drop_dump_05082025_020126.vcd"
+[dumpfile_mtime] "Thu May  8 06:01:34 2025"
+[dumpfile_size] 11483
+[savefile] "/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/vcd/Waveform_Valid_Drop_Segment.sav"
+[timestart] 0
+[size] 1908 999
+[pos] -598 -94
+*-14.800014 50000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_wrapper.
+[treeopen] test_wrapper.dut.
+[sst_width] 214
+[signals_width] 380
+[sst_expanded] 1
+[sst_vpaned_height] 292
+@28
+test_wrapper.rst
+@22
+test_wrapper.byte_in[7:0]
+@820
+test_wrapper.byte_in[7:0]
+@28
+test_wrapper.clk
+test_wrapper.valid_in
+test_wrapper.parsed_valid
+test_wrapper.latched_valid
+@22
+test_wrapper.new_order_ref[63:0]
+test_wrapper.latched_new_order_ref[63:0]
+test_wrapper.order_ref[63:0]
+test_wrapper.latched_order_ref[63:0]
+test_wrapper.price[31:0]
+test_wrapper.latched_price[31:0]
+test_wrapper.shares[31:0]
+test_wrapper.latched_shares[31:0]
+@28
+test_wrapper.side
+test_wrapper.latched_side
+@22
+test_wrapper.timestamp[47:0]
+test_wrapper.latched_timestamp[47:0]
+test_wrapper.parsed_type[3:0]
+test_wrapper.latched_type[3:0]
+test_wrapper.misc_data[63:0]
+test_wrapper.latched_misc_data[63:0]
+[pattern_trace] 1
+[pattern_trace] 0

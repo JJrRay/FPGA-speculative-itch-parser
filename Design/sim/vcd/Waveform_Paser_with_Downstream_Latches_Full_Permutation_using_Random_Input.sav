@@ -1,0 +1,156 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Thu May  8 05:56:47 2025
+[*]
+[dumpfile] "/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/vcd/parser_dump_05082025_005712.vcd"
+[dumpfile_mtime] "Thu May  8 04:58:45 2025"
+[dumpfile_size] 32522677
+[savefile] "/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/vcd/Waveform_Paser_with_Downstream_Latches_Full_Permutation_using_Random_Input.sav"
+[timestart] 0
+[size] 1908 999
+[pos] -1 -1
+*-16.574877 380000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] test_wrapper.
+[treeopen] test_wrapper.dut.
+[sst_width] 214
+[signals_width] 390
+[sst_expanded] 1
+[sst_vpaned_height] 292
+@28
+test_wrapper.rst
+@200
+-byte_in(Hex)
+@22
+test_wrapper.byte_in[7:0]
+@200
+-byte_in(ASCII)
+@820
+test_wrapper.byte_in[7:0]
+@28
+test_wrapper.clk
+test_wrapper.valid_in
+test_wrapper.parsed_valid
+test_wrapper.latched_valid
+@22
+test_wrapper.parsed_type[3:0]
+test_wrapper.latched_type[3:0]
+test_wrapper.order_ref[63:0]
+test_wrapper.latched_order_ref[63:0]
+@28
+test_wrapper.side
+test_wrapper.latched_side
+@22
+test_wrapper.shares[31:0]
+test_wrapper.latched_shares[31:0]
+test_wrapper.price[31:0]
+test_wrapper.latched_price[31:0]
+test_wrapper.new_order_ref[63:0]
+test_wrapper.latched_order_ref[63:0]
+test_wrapper.timestamp[47:0]
+test_wrapper.latched_timestamp[47:0]
+test_wrapper.misc_data[63:0]
+test_wrapper.latched_misc_data[63:0]
+@200
+-Non-exposed Decoder
+-Internal Signals for Demo
+-Add Order Decoder
+@28
+test_wrapper.dut.add_dec.add_internal_valid
+test_wrapper.dut.add_dec.decoder_enabled
+test_wrapper.dut.add_dec.is_add_order
+@22
+test_wrapper.dut.add_dec.byte_index[5:0]
+test_wrapper.dut.add_dec.suppress_count[5:0]
+@28
+test_wrapper.dut.add_dec.add_packet_invalid
+test_wrapper.dut.add_dec.add_side
+@22
+test_wrapper.dut.add_dec.add_order_ref[63:0]
+test_wrapper.dut.add_dec.add_parsed_type[3:0]
+test_wrapper.dut.add_dec.add_price[31:0]
+test_wrapper.dut.add_dec.add_shares[31:0]
+test_wrapper.dut.add_dec.add_stock_symbol[63:0]
+@200
+-Cancel Order Decoder
+@28
+test_wrapper.dut.cancel_dec.cancel_internal_valid
+test_wrapper.dut.cancel_dec.decoder_enabled
+test_wrapper.dut.cancel_dec.is_cancel_order
+@22
+test_wrapper.dut.cancel_dec.byte_index[5:0]
+test_wrapper.dut.cancel_dec.suppress_count[5:0]
+@28
+test_wrapper.dut.cancel_dec.cancel_packet_invalid
+@22
+test_wrapper.dut.cancel_dec.cancel_canceled_shares[31:0]
+test_wrapper.dut.cancel_dec.cancel_order_ref[63:0]
+test_wrapper.dut.cancel_dec.cancel_parsed_type[3:0]
+@200
+-Delete Order Decoder
+@28
+test_wrapper.dut.delete_dec.decoder_enabled
+test_wrapper.dut.delete_dec.delete_internal_valid
+test_wrapper.dut.delete_dec.is_delete_order
+@22
+test_wrapper.dut.delete_dec.byte_index[5:0]
+test_wrapper.dut.delete_dec.suppress_count[5:0]
+@28
+test_wrapper.dut.delete_dec.delete_packet_invalid
+@22
+test_wrapper.dut.delete_dec.delete_order_ref[63:0]
+test_wrapper.dut.delete_dec.delete_parsed_type[3:0]
+@200
+-Exec Order Decoder
+@28
+test_wrapper.dut.exec_dec.exec_internal_valid
+test_wrapper.dut.exec_dec.decoder_enabled
+test_wrapper.dut.exec_dec.is_exec_order
+@22
+test_wrapper.dut.exec_dec.byte_index[5:0]
+test_wrapper.dut.exec_dec.suppress_count[5:0]
+@28
+test_wrapper.dut.exec_dec.exec_packet_invalid
+@22
+test_wrapper.dut.exec_dec.exec_match_id[63:0]
+test_wrapper.dut.exec_dec.exec_order_ref[63:0]
+test_wrapper.dut.exec_dec.exec_parsed_type[3:0]
+test_wrapper.dut.exec_dec.exec_shares[31:0]
+test_wrapper.dut.exec_dec.exec_timestamp[47:0]
+@200
+-Replace Order Decoder
+@28
+test_wrapper.dut.replace_dec.replace_internal_valid
+test_wrapper.dut.replace_dec.decoder_enabled
+test_wrapper.dut.replace_dec.is_replace_order
+@22
+test_wrapper.dut.replace_dec.byte_index[5:0]
+test_wrapper.dut.replace_dec.suppress_count[5:0]
+@28
+test_wrapper.dut.replace_dec.replace_packet_invalid
+@22
+test_wrapper.dut.replace_dec.replace_new_order_ref[63:0]
+test_wrapper.dut.replace_dec.replace_old_order_ref[63:0]
+test_wrapper.dut.replace_dec.replace_parsed_type[3:0]
+test_wrapper.dut.replace_dec.replace_price[31:0]
+test_wrapper.dut.replace_dec.replace_shares[31:0]
+@200
+-Trade Order Decoder
+@28
+test_wrapper.dut.trade_dec.trade_internal_valid
+test_wrapper.dut.trade_dec.decoder_enabled
+test_wrapper.dut.trade_dec.is_trade
+@22
+test_wrapper.dut.trade_dec.byte_index[5:0]
+test_wrapper.dut.trade_dec.suppress_count[5:0]
+@28
+test_wrapper.dut.trade_dec.trade_packet_invalid
+@22
+test_wrapper.dut.trade_dec.trade_match_id[63:0]
+test_wrapper.dut.trade_dec.trade_order_ref[63:0]
+test_wrapper.dut.trade_dec.trade_parsed_type[3:0]
+test_wrapper.dut.trade_dec.trade_price[31:0]
+test_wrapper.dut.trade_dec.trade_shares[31:0]
+test_wrapper.dut.trade_dec.trade_stock_symbol[63:0]
+test_wrapper.dut.trade_dec.trade_timestamp[47:0]
+[pattern_trace] 1
+[pattern_trace] 0
