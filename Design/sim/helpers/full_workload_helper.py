@@ -25,7 +25,10 @@ from .payload_generator_helper import (
     generate_delete_order_payload,
     generate_replace_order_payload,
     generate_executed_order_payload, 
-    generate_trade_payload)
+    generate_trade_payload,
+    generate_add_mpid_payload,
+    generate_broken_trade_payload,
+    generate_executed_price_payload)
 
 
 def generate_payload_by_type(msg_type, mode='set'):
@@ -41,8 +44,13 @@ def generate_payload_by_type(msg_type, mode='set'):
         return generate_executed_order_payload(mode)
     elif msg_type == "trade":
         return generate_trade_payload(mode)
-
-
+    # New message types
+    elif msg_type == "add_mpid":
+        return generate_add_mpid_payload(mode)
+    elif msg_type == "broken_trade":
+        return generate_broken_trade_payload(mode)
+    elif msg_type == "executed_price":
+        return generate_executed_price_payload(mode)
     else:
         raise ValueError(f"Unsupported message type: {msg_type}")
 # def generate_payload_by_type(msg_type: str, mode: str = "set"):

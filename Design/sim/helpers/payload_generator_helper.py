@@ -159,3 +159,73 @@ def generate_trade_payload(mode='set'):
  
     return payload
 
+def generate_add_mpid_payload(mode='set'):
+    """Generate Add Order - MPID Attribution (Type F) - 40 bytes"""
+    if mode == 'set':
+        payload = [
+            ord('F'),                              # [0] Message Type
+            *b'\x01\x23\x45\x67\x89\xAB\xCD\xEF',  # [1:8] Order Ref
+            ord('B'),                              # [9] Side
+            *b'\x00\x00\x00\x64',                  # [10:13] Shares = 100
+            *b'AAPL    ',                          # [14:21] Stock Symbol (8 bytes)
+            *b'\x00\x00\x0F\xA0',                  # [22:25] Price = 4000
+            *b'\x00\x00\x00\x00',                  # [26:29] Reserved ← NEEDED!
+            *b'ATTR',                              # [30:33] Attribution (4 bytes)
+        ] + [0] * 6                                # [34:39] Reserved (6 bytes)
+    elif mode == 'rand':
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        side = random.choice([ord('B'), ord('S')])
+        shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        symbol = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=random.randint(3, 6))).ljust(8).encode('ascii')
+        price = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        reserved1 = [0] * 4  # ← NEEDED!
+        attribution = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", k=4)).encode('ascii')
+        reserved2 = [0] * 6
+        payload = [ord('F')] + list(order_ref) + [side] + list(shares) + list(symbol) + list(price) + reserved1 + list(attribution) + reserved2
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+    return payload
+
+
+def generate_broken_trade_payload(mode='set'):
+    """Generate Broken Trade (Type B) - 19 bytes"""
+    if mode == 'set':
+        payload = [
+            ord('B'),                              # [0] Message Type
+            *b'\x00\x00\x00\x00\x00\x01',          # [1:6] Timestamp 
+            *b'\x12\x34\x56\x78\x9A\xBC\xDE\xF0',  # [7:14] Match ID
+        ] + [0] * 4                                # [15:18] Reserved (4 bytes, not 10!)
+    elif mode == 'rand':
+        timestamp = random.getrandbits(48).to_bytes(6, 'big') 
+        match_id = random.getrandbits(64).to_bytes(8, 'big')
+        reserved = [0] * 4
+        payload = [ord('B')] + list(timestamp) + list(match_id) + reserved
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+    return payload
+
+
+def generate_executed_price_payload(mode='set'):
+    """Generate Executed Order With Price (Type C) - 36 bytes"""
+    if mode == 'set':
+        payload = [
+            ord('C'),                              # [0] Message Type
+            *b'\x00\x00\x00\x00\x00\x01',          # [1:6] Timestamp
+            *b'\xAA\xBB\xCC\xDD\xEE\xFF\x00\x11',  # [7:14] Order Ref
+            *b'\x00\x00\x00\x0A',                  # [15:18] Executed Shares = 10
+            *b'\x12\x34\x56\x78\x9A\xBC\xDE\xF0',  # [19:26] Match ID
+            ord('Y'),                              # [27] Printable
+            *b'\x00\x00\x27\x10',                  # [28:31] Execution Price = 10000
+        ] + [0] * 4                                # [32:35] Reserved (4 bytes)
+    elif mode == 'rand':
+        timestamp = random.getrandbits(48).to_bytes(6, 'big')
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        match_id = random.getrandbits(64).to_bytes(8, 'big')
+        printable = random.choice([ord('Y'), ord('N')])
+        price = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        reserved = [0] * 4
+        payload = [ord('C')] + list(timestamp) + list(order_ref) + list(shares) + list(match_id) + [printable] + list(price) + reserved
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+    return payload

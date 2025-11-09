@@ -17,8 +17,8 @@ SIM_CYCLES = 300  # Number of cycles to run the simulation--placeholder
 RESET_CYCLES = 3  # Number of cycles to reset the DUT before starting the test
 MSG_MODE = 'rand'  # Message mode for payload generation (set or rand)
 
-# MSG_SEQUENCE = generate_msg_sequence(40)
-MSG_SEQUENCE = generate_permutation_coverage_sequence()  # permutation coverage sequence  
+MSG_SEQUENCE = generate_msg_sequence(100)
+#MSG_SEQUENCE = generate_permutation_coverage_sequence()  # permutation coverage sequence  
 
 # 
 # MSG_SEQUENCE = [    'delete',     'delete',     'add'    ] # message sequence for testing

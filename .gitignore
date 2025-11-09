@@ -1,0 +1,11 @@
+# Fichiers à ignorer
+venv/
+__pycache__/
+*.vcd
+*.log
+*.pyc
+*.swp
+*.bak
+*.bit
+*.jou
+*.wdb

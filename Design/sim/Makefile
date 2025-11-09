@@ -43,10 +43,13 @@ VERILOG_SOURCES = \
     ../rtl/modules/replace_order_decoder.v \
     ../rtl/modules/executed_order_decoder.v \
     ../rtl/modules/trade_decoder.v \
+	../rtl/modules/add_order_mpid_decoder.v \
+    ../rtl/modules/broken_trade_decoder.v \
+    ../rtl/modules/executed_price_decoder.v \
 	../rtl/parser.v \
 	../rtl/test_wrapper.v \
-	../rtl/parser_latch_stage.v\
-    ../rtl/integrated.v
+	../rtl/parser_latch_stage.v \
+	 ../rtl/integrated.v 
 
 TOPLEVEL = integrated
 SIM = icarus

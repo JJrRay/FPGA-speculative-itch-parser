@@ -1,6 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1746684093" />
-    <testcase name="test_valid_drop_aborts_message" classname="test_valid_drop_abort" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_valid_drop_abort.py" lineno="24" time="0.01267242431640625" sim_time_ns="180.001" ratio_time="14204.148748946418" />
+    <property name="random_seed" value="1762638842" />
+    <testcase name="test_full_permutations" classname="test_integrated" file="/mnt/c/Users/raymo/source/repos/INF8503-Projet/Design/sim/test_integrated.py" lineno="38" time="-0.258770227432251" sim_time_ns="29450.001" ratio_time="-113807.53223517706">
+      <failure message="Test failed with RANDOM_SEED=1762638842" />
+    </testcase>
   </testsuite>
 </testsuites>

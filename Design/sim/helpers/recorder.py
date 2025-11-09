@@ -51,6 +51,9 @@ async def record_all_internal_valids(dut, total_cycles=300):
             "replace_internal_valid":   int(dut.replace_internal_valid.value),
             "executed_internal_valid":  int(dut.exec_internal_valid.value),
             "trade_internal_valid":     int(dut.trade_internal_valid.value),
+            "add_mpid_internal_valid":  int(dut.add_mpid_internal_valid.value),
+            "broken_internal_valid":    int(dut.broken_internal_valid.value),  # Fixed!
+            "exec_price_internal_valid": int(dut.exec_price_internal_valid.value),  # Fixed!
 
             "add_order_ref":            hex(getattr(dut, 'add_order_ref', 0).value.integer)         if hasattr(dut, 'add_order_ref') else 0,
             "add_shares":               hex(getattr(dut, 'add_shares', 0).value.integer)            if hasattr(dut, 'add_shares') else 0,
@@ -80,23 +83,33 @@ async def record_all_internal_valids(dut, total_cycles=300):
             "trade_price":              hex(getattr(dut, 'trade_price', 0).value.integer)           if hasattr(dut, 'trade_price') else 0,
             "trade_match_id":           hex(getattr(dut, 'trade_match_id', 0).value.integer)        if hasattr(dut, 'trade_match_id') else 0,
 
-            "add_parsed_type":      hex(getattr(dut, 'add_parsed_type', 0).value.integer)       if hasattr(dut, 'add_parsed_type') else "",
-            "cancel_parsed_type":   hex(getattr(dut, 'cancel_parsed_type', 0).value.integer)    if hasattr(dut, 'cancel_parsed_type') else "",
-            "delete_parsed_type":   hex(getattr(dut, 'delete_parsed_type', 0).value.integer)    if hasattr(dut, 'delete_parsed_type') else "",
-            "replace_parsed_type":  hex(getattr(dut, 'replace_parsed_type', 0).value.integer)   if hasattr(dut, 'replace_parsed_type') else "",
-            "exec_parsed_type":     hex(getattr(dut, 'exec_parsed_type', 0).value.integer)      if hasattr(dut, 'exec_parsed_type') else "",
-            "trade_parsed_type":    hex(getattr(dut, 'trade_parsed_type', 0).value.integer)     if hasattr(dut, 'trade_parsed_type') else "",
+            "add_mpid_order_ref":       hex(getattr(dut, 'add_mpid_order_ref', 0).value.integer) if hasattr(dut, 'add_mpid_order_ref') else 0,
+            "add_mpid_shares":          hex(getattr(dut, 'add_mpid_shares', 0).value.integer) if hasattr(dut, 'add_mpid_shares') else 0,
+            "add_mpid_price":           hex(getattr(dut, 'add_mpid_price', 0).value.integer) if hasattr(dut, 'add_mpid_price') else 0,
+            "add_mpid_side":            hex(getattr(dut, 'add_mpid_side', 0).value.integer) if hasattr(dut, 'add_mpid_side') else "",
+            "add_mpid_stock_symbol":    hex(getattr(dut, 'add_mpid_stock_symbol', 0).value.integer) if hasattr(dut, 'add_mpid_stock_symbol') else 0,
+            "add_mpid_attribution":     hex(getattr(dut, 'add_mpid_attribution', 0).value.integer) if hasattr(dut, 'add_mpid_attribution') else 0,
 
+            "broken_timestamp":         hex(getattr(dut, 'broken_timestamp', 0).value.integer) if hasattr(dut, 'broken_timestamp') else 0,  # Added!
+            "broken_match_id":          hex(getattr(dut, 'broken_match_id', 0).value.integer) if hasattr(dut, 'broken_match_id') else 0,  # Fixed!
 
+            "exec_price_timestamp":     hex(getattr(dut, 'exec_price_timestamp', 0).value.integer) if hasattr(dut, 'exec_price_timestamp') else 0,
+            "exec_price_order_ref":     hex(getattr(dut, 'exec_price_order_ref', 0).value.integer) if hasattr(dut, 'exec_price_order_ref') else 0,
+            "exec_price_shares":        hex(getattr(dut, 'exec_price_shares', 0).value.integer) if hasattr(dut, 'exec_price_shares') else 0,
+            "exec_price_match_id":      hex(getattr(dut, 'exec_price_match_id', 0).value.integer) if hasattr(dut, 'exec_price_match_id') else 0,
+            "exec_price_printable":     hex(getattr(dut, 'exec_price_printable', 0).value.integer) if hasattr(dut, 'exec_price_printable') else 0,
+            "exec_price_price":         hex(getattr(dut, 'exec_price_price', 0).value.integer) if hasattr(dut, 'exec_price_price') else 0,
+
+            "add_parsed_type":          hex(getattr(dut, 'add_parsed_type', 0).value.integer)       if hasattr(dut, 'add_parsed_type') else "",
+            "cancel_parsed_type":       hex(getattr(dut, 'cancel_parsed_type', 0).value.integer)    if hasattr(dut, 'cancel_parsed_type') else "",
+            "delete_parsed_type":       hex(getattr(dut, 'delete_parsed_type', 0).value.integer)    if hasattr(dut, 'delete_parsed_type') else "",
+            "replace_parsed_type":      hex(getattr(dut, 'replace_parsed_type', 0).value.integer)   if hasattr(dut, 'replace_parsed_type') else "",
+            "exec_parsed_type":         hex(getattr(dut, 'exec_parsed_type', 0).value.integer)      if hasattr(dut, 'exec_parsed_type') else "",
+            "trade_parsed_type":        hex(getattr(dut, 'trade_parsed_type', 0).value.integer)     if hasattr(dut, 'trade_parsed_type') else "",
+            "add_mpid_parsed_type":     hex(getattr(dut, 'add_mpid_parsed_type', 0).value.integer) if hasattr(dut, 'add_mpid_parsed_type') else "",
+            "broken_parsed_type":       hex(getattr(dut, 'broken_parsed_type', 0).value.integer) if hasattr(dut, 'broken_parsed_type') else "",  # Fixed!
+            "exec_price_parsed_type":   hex(getattr(dut, 'exec_price_parsed_type', 0).value.integer) if hasattr(dut, 'exec_price_parsed_type') else "",  # Fixed!
 
         }
-
-        # Log to console
-        # dut._log.info(
-        #     f"[Cycle {abs_cycle} | {sim_time}ns] "
-        #     f"add_valid={row['add_internal_valid']}, cancel_valid={row['cancel_internal_valid']}, "
-        #     f"add_order_ref={row['add_order_ref']}, add_shares={row['add_shares']}, add_price={row['add_price']}, "
-        #     f"cancel_order_ref={row['cancel_order_ref']}, cancel_shares={row['cancel_shares']}"
-        # )
 
         _recorded_log[abs_cycle] = row

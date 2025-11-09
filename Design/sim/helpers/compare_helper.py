@@ -18,7 +18,7 @@
 from helpers.payload_generator_helper import (
     generate_add_order_payload, generate_cancel_order_payload, 
     generate_delete_order_payload, generate_replace_order_payload, 
-    generate_executed_order_payload, generate_trade_payload)
+    generate_executed_order_payload, generate_trade_payload, generate_add_mpid_payload, generate_broken_trade_payload, generate_executed_price_payload)
 from helpers.full_workload_helper import MSG_LENGTHS
 from sim_config import RESET_CYCLES, SIM_CLK_PERIOD_NS
 from ITCH_config import SIM_HEADERS
@@ -109,7 +109,6 @@ def generate_expected_events_with_fields(message_plan, mode='set', parser_mode=F
 
         elif msg_type == "executed":
             payload = generate_executed_order_payload(mode)
-
             row["executed_internal_valid"]      = 1
             row["exec_timestamp"]               = hex(int.from_bytes(payload[1:7], byteorder='big'))
             row["exec_order_ref"]               = hex(int.from_bytes(payload[7:15], byteorder='big'))
@@ -126,6 +125,32 @@ def generate_expected_events_with_fields(message_plan, mode='set', parser_mode=F
             row["trade_stock_symbol"]           = hex(int.from_bytes(payload[20:28], byteorder='big'))  
             row["trade_price"]                  = hex(int.from_bytes(payload[28:32], byteorder='big'))
             row["trade_match_id"]               = hex(int.from_bytes(payload[32:40], byteorder='big'))
+
+        elif msg_type == "add_mpid":
+            payload = generate_add_mpid_payload(mode)
+            row["add_mpid_internal_valid"] = 1
+            row["add_mpid_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+            row["add_mpid_side"] = hex(0) if payload[9] == ord('B') else hex(1)
+            row["add_mpid_shares"] = hex(int.from_bytes(payload[10:14], byteorder='big'))
+            row["add_mpid_stock_symbol"] = hex(int.from_bytes(payload[14:22], byteorder='big'))
+            row["add_mpid_price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
+            row["add_mpid_attribution"] = hex(int.from_bytes(payload[30:34], byteorder='big'))  # Fixed!
+
+        elif msg_type == "broken_trade":
+            payload = generate_broken_trade_payload(mode)
+            row["broken_internal_valid"] = 1  # Fixed signal name!
+            row["broken_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))  # Added!
+            row["broken_match_id"] = hex(int.from_bytes(payload[7:15], byteorder='big'))  # Fixed!
+
+        elif msg_type == "executed_price":
+            payload = generate_executed_price_payload(mode)
+            row["exec_price_internal_valid"] = 1  # Fixed signal name!
+            row["exec_price_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+            row["exec_price_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
+            row["exec_price_shares"] = hex(int.from_bytes(payload[15:19], byteorder='big'))
+            row["exec_price_match_id"] = hex(int.from_bytes(payload[19:27], byteorder='big'))
+            row["exec_price_printable"] = hex(1) if payload[27] == ord('Y') else hex(0)  # Fixed!
+            row["exec_price_price"] = hex(int.from_bytes(payload[28:32], byteorder='big'))
 
 
  
@@ -321,6 +346,24 @@ def generate_expected_events_from_schedule(schedule, parser_mode=False):
                 row["price"] = hex(int.from_bytes(payload[28:32], byteorder='big'))
                 row["misc_data"] = hex(int.from_bytes(payload[32:40], byteorder='big'))  # match_id
 
+            elif msg_type == "add_mpid":
+                row["order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+                row["side"] = hex(0) if payload[9] == ord('B') else hex(1)
+                row["shares"] = hex(int.from_bytes(payload[10:14], byteorder='big'))
+                row["price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
+                row["misc_data"] = hex(int.from_bytes(payload[30:34], byteorder='big'))  # attribution
+
+            elif msg_type == "broken_trade":
+                row["timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+                row["misc_data"] = hex(int.from_bytes(payload[7:15], byteorder='big'))  # match_id
+
+            elif msg_type == "executed_price":
+                row["timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+                row["order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
+                row["shares"] = hex(int.from_bytes(payload[15:19], byteorder='big'))
+                row["price"] = hex(int.from_bytes(payload[28:32], byteorder='big'))
+                row["misc_data"] = hex(int.from_bytes(payload[19:27], byteorder='big'))  # match_id
+
         else:
             from ITCH_config import SIM_HEADERS
             row = {key: "" for key in SIM_HEADERS}
@@ -370,6 +413,34 @@ def generate_expected_events_from_schedule(schedule, parser_mode=False):
                 row["trade_stock_symbol"] = hex(int.from_bytes(payload[20:28], byteorder='big'))
                 row["trade_price"] = hex(int.from_bytes(payload[28:32], byteorder='big'))
                 row["trade_match_id"] = hex(int.from_bytes(payload[32:40], byteorder='big'))
+            
+            elif msg_type == "add_mpid":
+                row["add_mpid_parsed_type"] = hex(6)
+                row["add_mpid_internal_valid"] = 1
+                row["add_mpid_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+                row["add_mpid_side"] = hex(0) if payload[9] == ord('B') else hex(1)
+                row["add_mpid_shares"] = hex(int.from_bytes(payload[10:14], byteorder='big'))
+                row["add_mpid_stock_symbol"] = hex(int.from_bytes(payload[14:22], byteorder='big'))
+                row["add_mpid_price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
+                row["add_mpid_attribution"] = hex(int.from_bytes(payload[30:34], byteorder='big'))  # ← Fixed! Was [26:30]
+                
+            elif msg_type == "executed_price":
+                row["exec_price_parsed_type"] = hex(7)
+                row["exec_price_internal_valid"] = 1
+                row["exec_price_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+                row["exec_price_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
+                row["exec_price_shares"] = hex(int.from_bytes(payload[15:19], byteorder='big'))
+                row["exec_price_match_id"] = hex(int.from_bytes(payload[19:27], byteorder='big'))
+                row["exec_price_printable"] = hex(1) if payload[27] == ord('Y') else hex(0)  # ← Better to convert to 1/0
+                row["exec_price_price"] = hex(int.from_bytes(payload[28:32], byteorder='big')) 
+
+            elif msg_type == "broken_trade":
+                row["broken_parsed_type"] = hex(8)
+                row["broken_internal_valid"] = 1
+                row["broken_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))  # ← Added! Was missing
+                row["broken_match_id"] = hex(int.from_bytes(payload[7:15], byteorder='big'))  # ← Fixed! Was [1:9]
+
+ 
 
         expected_events.append(row)
 

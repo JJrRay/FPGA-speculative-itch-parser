@@ -13,7 +13,10 @@ MSG_LENGTHS = {
     "replace": 27,
     "delete": 9,
     "executed": 30,
-    "trade": 40
+    "trade": 40,
+    "add_mpid": 40,      # F - Add Order MPID Attribution
+    "broken_trade": 19,  # B - Broken Trade
+    "executed_price": 36 # C - Executed Order With Price
 }
 
 
@@ -26,7 +29,11 @@ SIM_HEADERS = [
     "cancel_internal_valid",
     "delete_internal_valid",
     "replace_internal_valid",
-    "executed_internal_valid", 
+    "executed_internal_valid",
+    "trade_internal_valid",
+    "add_mpid_internal_valid",
+    "broken_internal_valid",           # ← matches Verilog
+    "exec_price_internal_valid",       # ← matches Verilog
     
     "add_order_ref",
     "add_shares",
@@ -48,7 +55,6 @@ SIM_HEADERS = [
     "exec_shares",
     "exec_match_id",
 
-    "trade_internal_valid",
     "trade_timestamp",
     "trade_order_ref",
     "trade_side",
@@ -57,14 +63,32 @@ SIM_HEADERS = [
     "trade_price",
     "trade_match_id",
 
+    "add_mpid_order_ref",
+    "add_mpid_shares",
+    "add_mpid_price",
+    "add_mpid_side",
+    "add_mpid_stock_symbol",           # ← you were missing this!
+    "add_mpid_attribution",
+
+    "broken_timestamp",                # ← you were missing this!
+    "broken_match_id",
+    
+    "exec_price_timestamp",
+    "exec_price_order_ref",
+    "exec_price_shares",
+    "exec_price_match_id",
+    "exec_price_printable",
+    "exec_price_price",
+
     "add_parsed_type",
     "cancel_parsed_type",
     "delete_parsed_type",
     "replace_parsed_type",
     "exec_parsed_type",
-    "trade_parsed_type"
-
-
+    "trade_parsed_type",
+    "add_mpid_parsed_type",
+    "broken_parsed_type",              # ← Fixed! Was broken_trade_parsed_type
+    "exec_price_parsed_type"           # ← Fixed! Was executed_price_parsed_type
 ]
 
 PARSER_HEADERS = [
