@@ -1,13 +1,19 @@
-
 # Speculative ITCH Parser
 
-## Author
+## Original Author
 
 **Ruixuan Zhang (Rex)**  
 Independent Researcher  
-ruixuan.zhang.ee@gmail.com
+ruixuan.zhang.ee@gmail.com  
 rz0704rz@gmail.com
 
+## Extended By
+
+**Jean-Claude Junior Raymond**  
+Electrical Engineering Student, Polytechnique Montréal  
+Extended as part of INF8503 Design Project (Fall 2025)
+
+---
 
 ## Overview
 
@@ -17,6 +23,33 @@ The RTL modules are highly modular and reusable, with suppression logic, mid-pac
 
 Thanks to this flexible and structured design, the parser architecture can be trivially adapted to support other streaming protocols with raw serial input and canonical parallel output—such as market data feeds, trading logic interfaces, or packetized control streams.
 
+---
+
+## Extensions and Contributions
+
+This fork extends the original implementation with the following contributions:
+
+### Additional Message Type Decoders
+- **Add Order MPID ('F')** - 40 bytes: Adds market participant identifier support
+- **Executed Order with Price ('C')** - 36 bytes: Execution notifications with price information
+- **Broken Trade ('B')** - 19 bytes: Trade break notifications
+
+### PYNQ-Z2 FPGA Integration
+- Complete AXI4-Stream wrapper for DMA integration
+- AXI4-Lite register interface for result readback
+- Vivado block design for Zynq-7000 SoC deployment
+- Python/PYNQ driver for hardware validation
+
+### Four-Phase Validation Methodology
+1. **Python Golden Model** (original work) - Pure software reference implementation
+2. **Cocotb + Icarus** (extended from author) - RTL simulation with added decoder tests
+3. **Vivado Simulator** - Pre-synthesis validation with AXI interfaces
+4. **PYNQ Hardware** - On-target validation with real DMA transfers
+
+### Documentation
+- Comprehensive technical report documenting the implementation
+- Detailed latency analysis for all 9 message types
+- FPGA resource utilization analysis
 
 ---
 
@@ -45,7 +78,37 @@ Thanks to this flexible and structured design, the parser architecture can be tr
   - Output logs and waveform automation (e.g., `recorded_log.csv`, `Makefile`)
   - [README_testbench.md](Design/sim/README_testbench.md)
 
+- [`vivado/`](vivado/) *(new)*
+  - Vivado project files for PYNQ-Z2
+  - Block design with AXI DMA and custom IP
+  - Constraint files and bitstream generation
+
+- [`pynq/`](pynq/) *(new)*
+  - Python drivers for hardware testing
+  - Jupyter notebooks for demonstration
+  - Overlay files (.bit, .hwh)
+
 - [README.md](README.md) 
+
+---
+
+## Supported Message Types
+
+| Type | Name | Char | Size | Extracted Fields |
+|------|------|------|------|------------------|
+| 0 | Add Order | 'A' | 36 B | order_ref, side, shares, stock, price |
+| 1 | Cancel Order | 'X' | 23 B | order_ref, canceled_shares |
+| 2 | Delete Order | 'D' | 9 B | order_ref |
+| 3 | Executed Order | 'E' | 30 B | order_ref, executed_shares, match_id |
+| 4 | Replace Order | 'U' | 27 B | old_order_ref, new_order_ref, shares, price |
+| 5 | Trade | 'P' | 40 B | order_ref, side, shares, stock, price, match_id |
+| 6 | Add Order MPID | 'F' | 40 B | order_ref, side, shares, stock, price, attribution |
+| 7 | Exec with Price | 'C' | 36 B | order_ref, exec_shares, match_id, price |
+| 8 | Broken Trade | 'B' | 19 B | reason_code, match_id |
+
+---
+
+## Waveforms
 
 Waveform Segment
 ![Waveform Segment](Design/sim/vcd/First_Packet_Segment.png)
@@ -56,16 +119,24 @@ Back-to-Back Detail
 Mid-Packet Valid Drop Detail
 ![Waveform Segment - Mid-Packet Valid Drop](Design/sim/vcd/Waveform_Valid_Drop_Segment.png)
 
+---
 
 ## Architecture Summary
 
 ### Core RTL Files
 
-- `*_order_decoder.v`: One decoder per ITCH message type (Add, Cancel, Delete, Replace, Executed, Trade)
+- `*_order_decoder.v`: One decoder per ITCH message type (Add, Cancel, Delete, Replace, Executed, Trade, Add MPID, Exec with Price, Broken Trade)
 - `parser.v`: Combinational arbitration logic that selects a valid decoder output
 - `parser_latch_stage.v`: Optional pipeline register to stabilize downstream sampling
 - `itch_*.vh`: Macro libraries for decoding logic, suppression, reset, and validity handling
 - `rtl/signal_definitions/`: Decoder-specific field definitions for modular wiring
+
+### FPGA Integration Files *(new)*
+
+- `Itch_axi_stream_v1_0.v`: Top-level AXI wrapper
+- `integrated.v`: Parser + latch stage integration
+- `S00_AXI.v`: AXI-Lite slave for register access
+- `S00_AXIS.v`: AXI-Stream slave for data input
 
 ---
 
@@ -93,7 +164,9 @@ always_comb begin
     // Count active decoders
     valid_count = add_internal_valid + cancel_internal_valid +
                   delete_internal_valid + replace_internal_valid +
-                  exec_internal_valid + trade_internal_valid;
+                  exec_internal_valid + trade_internal_valid +
+                  add_mpid_internal_valid + exec_price_internal_valid +
+                  broken_internal_valid;
 
     // Assert parsed_valid only if exactly one decoder fires
     if (valid_in && valid_count == 1) begin
@@ -171,6 +244,20 @@ end
   - The parser outputs canonical data at cycle N+1
 - This results in only 1 cycle of parsing delay
 
+### Latency by Message Type
+
+| Message Type | Length | Parse Cycles | Latency @ 100 MHz |
+|--------------|--------|--------------|-------------------|
+| Delete Order ('D') | 9 B | 10 | 100 ns |
+| Broken Trade ('B') | 19 B | 20 | 200 ns |
+| Cancel Order ('X') | 23 B | 24 | 240 ns |
+| Replace Order ('U') | 27 B | 28 | 280 ns |
+| Executed Order ('E') | 30 B | 31 | 310 ns |
+| Add Order ('A') | 36 B | 37 | 370 ns |
+| Exec with Price ('C') | 36 B | 37 | 370 ns |
+| Trade ('P') | 40 B | 41 | 410 ns |
+| Add Order MPID ('F') | 40 B | 41 | 410 ns |
+
 ---
 
 ## Key Features
@@ -205,16 +292,36 @@ end
 
 ---
 
+## FPGA Implementation Results
+
+### Target Platform
+- **Board**: PYNQ-Z2
+- **SoC**: Zynq-7000 (XC7Z020-1CLG400C)
+- **Clock**: 100 MHz
+
+### Resource Utilization
+
+| Resource | Used | Available | Utilization |
+|----------|------|-----------|-------------|
+| LUTs | 2,578 | 53,200 | 4.85% |
+| Flip-Flops | 3,705 | 106,400 | 3.48% |
+| BRAM | 0 | 140 | 0% |
+| DSP | 0 | 220 | 0% |
+
+---
+
 ## Verification and Testing
 
-- Exhaustive testbench using cocotb
-- All ITCH message types validated with:
+- Exhaustive testbench using Cocotb
+- All 9 ITCH message types validated with:
   - Random values in all fields
   - Permuted sequences and back-to-back messages
+- Python golden model for reference validation
 - Automated `Makefile`:
   - Builds and runs the simulation
   - Dumps `vcd` waveform and auto-opens GTKWave
 - Latching logic (`parser_latch_stage.v`) verified separately
+- Hardware validation on PYNQ-Z2 with real DMA transfers
 
 ---
 
@@ -236,8 +343,22 @@ end
   - Description, Author, Start Date, Version
   - Detailed changelog entries
 
+---
+
+## References
+
+1. R. Zhang, "Speculative, Macro-Driven FPGA Architecture for Ultra-Low-Latency ITCH Parsing in High-Frequency Trading Systems," *TechRxiv*, 2023. [Online]. Available: https://www.techrxiv.org/users/924957/articles/1296717
+
+2. NASDAQ, "ITCH 5.0 Specification," *NASDAQ Trader*, 2020. [Online]. Available: https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification.pdf
+
+3. Xilinx, "PYNQ: Python Productivity for Zynq," *PYNQ Documentation*, 2023. [Online]. Available: https://pynq.readthedocs.io/
+
+---
+
 ## License
 
 This repository is publicly viewable for academic and demonstration purposes only.
 
-All rights are reserved by the author. Reproduction, modification, or redistribution of the source code is not permitted without explicit written consent.
+All rights are reserved by the original author (Ruixuan Zhang). Reproduction, modification, or redistribution of the source code is not permitted without explicit written consent.
+
+Extensions by Jean-Claude Junior Raymond are provided for academic purposes as part of the INF8503 course project at Polytechnique Montréal.
