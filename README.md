@@ -29,6 +29,10 @@ Thanks to this flexible and structured design, the parser architecture can be tr
 
 This fork extends the original implementation with the following contributions:
 
+### RTL Modifications for Vivado Synthesis Compatibility
+- **Single-process refactoring**: The original decoder modules used two separate `always` blocks that modified the same signals, which is not supported by Vivado synthesis. All decoders were refactored to consolidate signal assignments into a single process while preserving the original logic and modularity.
+- This modification was required for successful synthesis on Xilinx tools without altering the functional behavior of the parsers.
+
 ### Additional Message Type Decoders
 - **Add Order MPID ('F')** - 40 bytes: Adds market participant identifier support
 - **Executed Order with Price ('C')** - 36 bytes: Execution notifications with price information
