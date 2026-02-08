@@ -74,6 +74,7 @@ This fork extends the original implementation with the following contributions:
 - `test_parser_canonical.py` - Extended canonical validation for new decoders
 - `helpers/payload_generator.py` - Added payload generators for new message types
 - `helpers/compare.py` - Updated comparison logic for new fields
+- `ITCH_Golden_Model.py` - added python golden model
 
 ### PYNQ-Z2 FPGA Integration
 - Complete AXI4-Stream wrapper for DMA integration
