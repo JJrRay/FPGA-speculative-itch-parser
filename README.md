@@ -1,4 +1,4 @@
-# Speculative ITCH Parser
+# FPGA Speculative ITCH Parser
 
 ## Original Author
 
