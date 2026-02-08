@@ -69,6 +69,12 @@ This fork extends the original implementation with the following contributions:
 - `itch_suppression.vh` - Updated suppression logic
 - `field_macros/` - Added field definitions for new decoders
 
+**Modified Cocotb simulation files (`sim/`):**
+- `test_integrated.py` - Added test cases for 3 new message types
+- `test_parser_canonical.py` - Extended canonical validation for new decoders
+- `helpers/payload_generator.py` - Added payload generators for new message types
+- `helpers/compare.py` - Updated comparison logic for new fields
+
 ### PYNQ-Z2 FPGA Integration
 - Complete AXI4-Stream wrapper for DMA integration
 - AXI4-Lite register interface for result readback
