@@ -122,10 +122,8 @@ This fork extends the original implementation with the following contributions:
 - [`vivado/`](vivado/) *(new)*
   - Vivado project files for PYNQ-Z2
   - Block design with AXI DMA and custom IP
-  - Constraint files and bitstream generation
 
 - [`pynq/`](pynq/) *(new)*
-  - Python drivers for hardware testing
   - Jupyter notebooks for demonstration
   - Overlay files (.bit, .hwh)
 
