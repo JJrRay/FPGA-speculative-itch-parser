@@ -4,8 +4,9 @@
 //
 // Description: Module to decode Cancel Order ('X') messages from ITCH payloads.
 // Author: RZ
+// Editor: JR
 // Start Date: 04172025
-// Version: 0.7
+// Version: 1.0
 // Changelog
 // =============================================
 // [20250427-1] RZ: Initial version created for Cancel Order payload decoding.
@@ -15,6 +16,7 @@
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250505-1] RZ: Updated to use macros
 // [20250506-1] RZ: Added parsed type
+// [20251007-1] JR: Fixed suppression logic for FPGA synthesis - single always_ff block
 // =============================================
 // ------------------------------------------------------------------------------------------------
 // Architecture Notes:
@@ -47,25 +49,31 @@ module cancel_order_decoder (
     parameter MSG_TYPE   = 8'h58;   // ASCII 'X'
     parameter MSG_LENGTH = 23;
 
-    `include "macros/itch_len.vh"
-    `include "macros/itch_suppression.vh"
-    `include "macros/field_macros/itch_fields_cancel.vh"
-    `include "macros/itch_reset.vh"
-    `include "macros/itch_core_decode.vh"
+    `include "itch_len.vh"
+    `include "itch_suppression.vh"
+    `include "itch_fields_cancel.vh"
+    `include "itch_reset.vh"
+    `include "itch_core_decode.vh"
 
     logic [5:0] byte_index;
     logic       is_cancel_order;
 
+    // Suppression logic declaration
+    `ITCH_SUPPRESSION_DECL
+
     always_ff @(posedge clk) begin
+        // Suppression counter update
+        `ITCH_SUPPRESSION_UPDATE
+
         if (rst) begin
-            byte_index              <= 0;
+            byte_index        <= 0;
             `is_order         <= 0;
             `ITCH_RESET_LOGIC
 
         end else if (valid_in && decoder_enabled) begin
-                `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
-                `internal_valid <= 0;
-                `packet_invalid <= 0;
+            `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
+            `internal_valid <= 0;
+            `packet_invalid <= 0;
 
             if (is_cancel_order) begin
                 case (byte_index)
@@ -83,27 +91,27 @@ module cancel_order_decoder (
                     12: cancel_canceled_shares[7:0]   <= byte_in;
                 endcase
 
-                if (byte_index == MSG_LENGTH - 1)
-                   
+                if (byte_index == MSG_LENGTH - 1) begin
                     `internal_valid <= 1;
                     `parsed_type    <= 4'd1;
+                end
             end
 
-            if (byte_index >= MSG_LENGTH && is_cancel_order)
-                
+            if (byte_index >= MSG_LENGTH && is_cancel_order) begin
                 `packet_invalid <= 1;
+            end
         end
 
         if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
-        ))
+        )) begin
             `packet_invalid <= 1;
+            suppress_count <= 0;   // Allow immediate restart
+            byte_index <= 0;
+        end
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
-        `include "macros/itch_abort_on_valid_drop.vh"
     end
 
 endmodule
-
-

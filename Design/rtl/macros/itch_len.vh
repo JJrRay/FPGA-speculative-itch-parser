@@ -5,13 +5,14 @@
 // Description: Function to return ITCH message length based on message type.
 //              Used by speculative decoders for suppression and recheck logic.
 // Author: RZ
+// Editor: JR
 // Start Date: 20250505
 // Version: 0.2
 //
 // Changelog
 // =============================================
 // [20250505-1] RZ: Initial standalone macro for message length lookup.
-// [20250508-1] RZ: Added 'F' (Add Order MPID), 'C' (Executed With Price), 'B' (Broken Trade)
+// [20251008-1] JR: Added 'F' (Add Order MPID), 'C' (Executed With Price), 'B' (Broken Trade)
 
 function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
     case (msg_type)

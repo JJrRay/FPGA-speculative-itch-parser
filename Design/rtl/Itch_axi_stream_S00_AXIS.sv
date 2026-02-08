@@ -1,7 +1,21 @@
-
-`timescale 1 ns / 1 ps
-
-`timescale 1 ns / 1 ps
+// ============================================================
+// Itch_axi_stream_S00_AXIS.v
+// ============================================================
+//
+// Description: AXI4-Stream Slave interface for ITCH raw data.
+//              Provides a simple pass-through mechanism to extract 
+//              the least significant byte (LSB) from the stream 
+//              and forward it to the ITCH parser logic.
+//
+// Author: JR
+// Start Date: 20251009
+// Version: 0.1
+//
+// Changelog
+// ============================================================
+// [20250507-1] JR: Initial stream-to-parser adapter. 
+//                  Implemented basic TREADY/TVALID handshaking.
+// ============================================================
 
 module Itch_axi_stream_v1_0_S00_AXIS #
 (

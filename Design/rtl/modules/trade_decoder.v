@@ -6,8 +6,9 @@
 //              Parses 44-byte ITCH 'P' messages from a raw byte stream.
 //
 // Author: RZ
+// Editor: JR
 // Start Date: 20250501
-// Version: 0.4
+// Version: 0.7
 //
 // Changelog
 // =============================================
@@ -15,6 +16,7 @@
 // [20250501-2] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250502-1] RZ: Updated msg structure
 // [20250505-1] RZ: Updated to use macros
+// [20251007-1] JR: Fixed suppression logic for FPGA synthesis - single always_ff block
 // =============================================
 // ------------------------------------------------------------------------------------------------
 // Protocol Version Note:
@@ -65,17 +67,23 @@ module trade_decoder (
     parameter MSG_TYPE   = 8'h50;  // ASCII 'P'
     parameter MSG_LENGTH = 40;
 
-    `include "macros/itch_len.vh"
-    `include "macros/itch_suppression.vh"
-    `include "macros/field_macros/itch_fields_trade.vh"
-    `include "macros/itch_reset.vh"
-    `include "macros/itch_core_decode.vh"
+    `include "itch_len.vh"
+    `include "itch_suppression.vh"
+    `include "itch_fields_trade.vh"
+    `include "itch_reset.vh"
+    `include "itch_core_decode.vh"
 
     logic [5:0] byte_index;
     logic       is_trade;
 
+    // Suppression logic declaration
+    `ITCH_SUPPRESSION_DECL
+
     // Main decode logic
     always_ff @(posedge clk) begin
+        // Suppression counter update
+        `ITCH_SUPPRESSION_UPDATE
+
         if (rst) begin
             byte_index            <= 0;
             `is_order          <= 0;
@@ -108,7 +116,6 @@ module trade_decoder (
 
                     15: trade_side <= (byte_in == "S");
 
-
                     16: trade_shares[31:24] <= byte_in;
                     17: trade_shares[23:16] <= byte_in;
                     18: trade_shares[15:8]  <= byte_in;
@@ -138,26 +145,27 @@ module trade_decoder (
                     39: trade_match_id[7:0]   <= byte_in;
                 endcase
 
-                if (byte_index == MSG_LENGTH - 1)
+                if (byte_index == MSG_LENGTH - 1) begin
                     `internal_valid <= 1;
                     `parsed_type    <= 4'd5;
-                    
+                end
             end
 
-            if (byte_index >= MSG_LENGTH && is_trade)
-               
+            if (byte_index >= MSG_LENGTH && is_trade) begin
                 `packet_invalid <= 1;
+            end
         end
 
         if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
-        ))
+        )) begin
             `packet_invalid <= 1;
+            suppress_count <= 0;   // Allow immediate restart
+            byte_index <= 0;
+        end
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
-        `include "macros/itch_abort_on_valid_drop.vh"
     end
 
 endmodule
-

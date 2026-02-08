@@ -1,4 +1,24 @@
-`timescale 1 ns / 1 ps
+// ============================================================
+// Itch_axi_stream.v
+// ============================================================
+//
+// Description: Top-level wrapper for the ITCH Parser IP core.
+//              Integrates three primary functional blocks:
+//              1. AXIS Slave: Ingests raw byte streams (e.g., from DMA).
+//              2. ITCH Parser: Decodes ITCH 5.0 financial messages.
+//              3. AXI-Lite Slave: Provides CPU-accessible register
+//                 mapping for decoded market data fields.
+//
+// Author: JR
+// Start Date: 20251009
+// Version: 1.0
+//
+// Changelog
+// ============================================================
+// [20250507-1] JR: Initial top-level integration. Wired AXIS 
+//                  sub-module to parser and parser to AXI-Lite 
+//                  register bank.
+// ============================================================
 
 module Itch_axi_stream_v1_0 #
 (

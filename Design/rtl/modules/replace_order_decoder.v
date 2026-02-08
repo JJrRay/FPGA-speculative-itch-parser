@@ -6,8 +6,9 @@
 //              Parses 25-byte ITCH 'U' messages from a raw byte stream.
 //
 // Author: RZ
+// Editor: JR
 // Start Date: 20250428
-// Version: 0.6
+// Version: 0.9
 //
 // Changelog
 // =============================================
@@ -17,6 +18,7 @@
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250505-1] RZ: Updated to use macros
 // [20250506-1] RZ: Added parsed type
+// [20251007-1] JR: Fixed suppression logic for FPGA synthesis - single always_ff block
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -63,20 +65,26 @@ module replace_order_decoder (
     parameter MSG_TYPE   = 8'h55;  // ASCII 'U'
     parameter MSG_LENGTH = 27;
 
-    `include "macros/itch_len.vh"
-    `include "macros/itch_suppression.vh"
-    `include "macros/field_macros/itch_fields_replace.vh"
-    `include "macros/itch_reset.vh"
-    `include "macros/itch_core_decode.vh"
+    `include "itch_len.vh"
+    `include "itch_suppression.vh"
+    `include "itch_fields_replace.vh"
+    `include "itch_reset.vh"
+    `include "itch_core_decode.vh"
 
     logic [5:0] byte_index;
     logic       is_replace_order;
 
+    // Suppression logic declaration
+    `ITCH_SUPPRESSION_DECL
+
     // Main decode logic
     always_ff @(posedge clk) begin
+        // Suppression counter update
+        `ITCH_SUPPRESSION_UPDATE
+
         if (rst) begin
-            byte_index              <= 0;
-            `is_order          <= 0;
+            byte_index        <= 0;
+            `is_order         <= 0;
             `ITCH_RESET_LOGIC
 
         end else if (valid_in && decoder_enabled) begin
@@ -114,26 +122,27 @@ module replace_order_decoder (
                     //   [25:26]  = Reserved bytes (ignored)
                 endcase
 
-                if (byte_index == MSG_LENGTH - 1)
-                    
+                if (byte_index == MSG_LENGTH - 1) begin
                     `internal_valid <= 1;
                     `parsed_type    <= 4'd4;
+                end
             end
 
-            if (byte_index >= MSG_LENGTH && is_replace_order)
-                 
+            if (byte_index >= MSG_LENGTH && is_replace_order) begin
                 `packet_invalid <= 1;
+            end
         end
 
         if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
-        ))
+        )) begin
             `packet_invalid <= 1;
-
+            suppress_count <= 0;   // Allow immediate restart
+            byte_index <= 0;
+        end
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
-        `include "macros/itch_abort_on_valid_drop.vh"
     end
 
 endmodule

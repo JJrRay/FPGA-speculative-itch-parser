@@ -6,8 +6,9 @@
 //              Parses 30-byte ITCH 'E' messages from a raw byte stream.
 //
 // Author: RZ
+// Editor: JR
 // Start Date: 20250501
-// Version: 0.5
+// Version: 0.8
 //
 // Changelog
 // =============================================
@@ -16,6 +17,7 @@
 // [20250504-1] RZ: Fixed timestamp width to 48-bit and corrected field byte ranges.
 // [20250505-1] RZ: Updated to use macros
 // [20250506-1] RZ: Added parsed type
+// [20251007-1] JR: Fixed suppression logic for FPGA synthesis - single always_ff block
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -56,17 +58,23 @@ module executed_order_decoder (
     parameter MSG_TYPE   = 8'h45;  // ASCII 'E'
     parameter MSG_LENGTH = 30;
 
-    `include "macros/itch_len.vh"
-    `include "macros/itch_suppression.vh"
-    `include "macros/field_macros/itch_fields_executed.vh"
-    `include "macros/itch_reset.vh"
-    `include "macros/itch_core_decode.vh"
+    `include "itch_len.vh"
+    `include "itch_suppression.vh"
+    `include "itch_fields_executed.vh"
+    `include "itch_reset.vh"
+    `include "itch_core_decode.vh"
 
     logic [5:0] byte_index;
     logic       is_exec_order;
 
+    // Suppression logic declaration
+    `ITCH_SUPPRESSION_DECL
+
     // Main decode logic
     always_ff @(posedge clk) begin
+        // Suppression counter update
+        `ITCH_SUPPRESSION_UPDATE
+
         if (rst) begin
             byte_index          <= 0;
             `is_order          <= 0;
@@ -111,25 +119,27 @@ module executed_order_decoder (
                     26: exec_match_id[7:0]    <= byte_in;
                 endcase
 
-                if (byte_index == MSG_LENGTH - 1)
-               
+                if (byte_index == MSG_LENGTH - 1) begin
                     `internal_valid <= 1;
                     `parsed_type    <= 4'd3;
+                end
             end
 
-            if (byte_index >= MSG_LENGTH && is_exec_order)
- 
+            if (byte_index >= MSG_LENGTH && is_exec_order) begin
                 `packet_invalid <= 1;
+            end
         end
 
         if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
-        ))
+        )) begin
             `packet_invalid <= 1;
+            suppress_count <= 0;   // Allow immediate restart
+            byte_index <= 0;
+        end
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
-        `include "macros/itch_abort_on_valid_drop.vh"
     end
 
 endmodule

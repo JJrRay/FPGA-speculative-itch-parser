@@ -1,4 +1,22 @@
-`timescale 1 ns / 1 ps
+// ============================================================
+// tb_itch_axi_stream.v
+// ============================================================
+//
+// Description: System-level testbench for the ITCH Parser IP.
+//              Simulates a DMA-driven AXI-Stream source to feed 
+//              raw ITCH message bytes and an AXI-Lite master to 
+//              verify decoded output registers.
+//
+// Author: JR
+// Start Date: 20251009
+// Version: 0.1
+//
+// Changelog
+// ============================================================
+// [20250507-1] JR: Created testbench with tasks for AXIS streaming 
+//                  and AXI-Lite read transactions. Verified 
+//                  Delete Order ('D') message parsing.
+// ============================================================
 
 module tb_itch_axi_stream;
 

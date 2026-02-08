@@ -5,8 +5,9 @@
 // Description: Zero-wait speculative Add Order decoder for ITCH feed.
 //              Begins decoding at byte 0 and maps order_ref from byte 1.
 // Author: RZ
+// Editor: JR
 // Start Date: 20250430
-// Version: 0.8
+// Version: 1.1
 //
 // Changelog
 // =============================================
@@ -18,6 +19,7 @@
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250505-1] RZ: Updated to use macros
 // [20250506-1] RZ: Added parsed type output
+// [20251007-1] JR: Fixed suppression logic for FPGA synthesis - single always_ff block
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -57,17 +59,23 @@ module add_order_decoder (
     parameter MSG_TYPE   = 8'h41;   // ASCII 'A'
     parameter MSG_LENGTH = 36;
 
-    `include "macros/itch_len.vh"
-    `include "macros/itch_suppression.vh"
-    `include "macros/field_macros/itch_fields_add.vh"
-    `include "macros/itch_reset.vh"
-    `include "macros/itch_core_decode.vh"
+    `include "itch_len.vh"
+    `include "itch_suppression.vh"
+    `include "itch_fields_add.vh"
+    `include "itch_reset.vh"
+    `include "itch_core_decode.vh"
 
     logic [5:0] byte_index;
     logic       is_add_order;
     
+    // Suppression logic declaration
+    `ITCH_SUPPRESSION_DECL
+
     // Main decode logic
     always_ff @(posedge clk) begin
+        // Suppression counter update
+        `ITCH_SUPPRESSION_UPDATE
+
         if (rst) begin
             byte_index         <= 0;
             `is_order          <= 0;
@@ -108,27 +116,27 @@ module add_order_decoder (
                     25: add_price[7:0]           <= byte_in;
                 endcase
 
-                if (byte_index == MSG_LENGTH - 1)
+                if (byte_index == MSG_LENGTH - 1) begin
                     `internal_valid <= 1;
-                    `parsed_type    <= 4'd0; 
-                    
+                    `parsed_type    <= 4'd0;
+                end
             end
 
-            if (byte_index >= MSG_LENGTH && is_add_order)
-             
+            if (byte_index >= MSG_LENGTH && is_add_order) begin
                 `packet_invalid <= 1;
+            end
         end
 
         if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
-        ))
+        )) begin
             `packet_invalid <= 1;
+            suppress_count <= 0;   // Allow immediate restart
+            byte_index <= 0;
+        end
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
-        `include "macros/itch_abort_on_valid_drop.vh"
-
-
     end
 
 endmodule

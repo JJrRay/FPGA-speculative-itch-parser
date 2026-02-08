@@ -1,4 +1,21 @@
-`timescale 1 ns / 1 ps
+// ============================================================
+// Itch_axi_stream_S00_AXI.v
+// ============================================================
+//
+// Description: AXI4-Lite Slave interface for ITCH Parser data.
+//              Maps latched financial message fields (Price, Shares, 
+//              Order Refs, etc.) to a 32-bit register space for 
+//              software-level read access.
+//
+// Author: JR
+// Start Date: 20251009
+// Version: 1.0
+//
+// Changelog
+// ============================================================
+// [20250507-1] JR: Initial implementation of AXI-Lite read mux 
+//                  and address decoding for ITCH fields.
+// ============================================================
 
 module Itch_axi_stream_v1_0_S00_AXI #
 (

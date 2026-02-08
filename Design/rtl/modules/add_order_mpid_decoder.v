@@ -5,13 +5,14 @@
 // Description: Zero-wait speculative Add Order with MPID Attribution decoder for ITCH feed.
 //              Begins decoding at byte 0 and maps order_ref from byte 1.
 //              Identical to 'A' (Add Order) but includes MPID attribution field.
-// Author: RZ
-// Start Date: 20250508
-// Version: 1.0
+// Author: JR
+// Start Date: 20251112
+// Version: 1.1
 //
 // Changelog
 // =============================================
-// [20250508-1] Initial implementation based on add_order_decoder with MPID field.
+// [20251002-1] JR: Initial implementation based on add_order_decoder with MPID field.
+// [20251007-1] JR: Fixed suppression logic for FPGA synthesis - single always_ff block
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -57,17 +58,23 @@ module add_order_mpid_decoder (
     parameter MSG_TYPE   = 8'h46;   // ASCII 'F'
     parameter MSG_LENGTH = 40;
 
-    `include "macros/itch_len.vh"
-    `include "macros/itch_suppression.vh"
-    `include "macros/field_macros/itch_fields_add_mpid.vh"
-    `include "macros/itch_reset.vh"
-    `include "macros/itch_core_decode.vh"
+    `include "itch_len.vh"
+    `include "itch_suppression.vh"
+    `include "itch_fields_add_mpid.vh"
+    `include "itch_reset.vh"
+    `include "itch_core_decode.vh"
 
     logic [5:0] byte_index;
     logic       is_add_mpid_order;
     
+    // Suppression logic declaration
+    `ITCH_SUPPRESSION_DECL
+    
     // Main decode logic
     always_ff @(posedge clk) begin
+         // Suppression counter update
+        `ITCH_SUPPRESSION_UPDATE
+        
         if (rst) begin
             byte_index         <= 0;
             `is_order          <= 0;
@@ -147,7 +154,7 @@ module add_order_mpid_decoder (
             `packet_invalid <= 1;
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
-        `include "macros/itch_abort_on_valid_drop.vh"
+        `include "itch_abort_on_valid_drop.vh"
     end
 
 endmodule
