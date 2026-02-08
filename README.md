@@ -1,13 +1,6 @@
-# Speculative ITCH Parser
+# FPGA Speculative ITCH Parser
 
-## Original Author
-
-**Ruixuan Zhang (Rex)**  
-Independent Researcher  
-ruixuan.zhang.ee@gmail.com  
-rz0704rz@gmail.com
-
-## Extended By
+## Author
 
 **Jean-Claude Junior Raymond**  
 Electrical Engineering Student, Polytechnique Montréal  
@@ -393,6 +386,17 @@ end
 2. NASDAQ, "ITCH 5.0 Specification," *NASDAQ Trader*, 2020. [Online]. Available: https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification.pdf
 
 3. Xilinx, "PYNQ: Python Productivity for Zynq," *PYNQ Documentation*, 2023. [Online]. Available: https://pynq.readthedocs.io/
+
+---
+
+## Original Work
+
+This project is based on the original ITCH parser implementation by:
+
+**Ruixuan Zhang (Rex)**  
+Independent Researcher  
+ruixuan.zhang.ee@gmail.com  
+rz0704rz@gmail.com
 
 ---
 
