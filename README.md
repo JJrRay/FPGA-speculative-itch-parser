@@ -1,4 +1,4 @@
-# FPGA Speculative ITCH Parser
+# Speculative ITCH Parser
 
 ## Original Author
 
@@ -37,6 +37,37 @@ This fork extends the original implementation with the following contributions:
 - **Add Order MPID ('F')** - 40 bytes: Adds market participant identifier support
 - **Executed Order with Price ('C')** - 36 bytes: Execution notifications with price information
 - **Broken Trade ('B')** - 19 bytes: Trade break notifications
+
+### RTL Modifications and Additions
+
+**New files created (`rtl/`):**
+- `itch_axi_stream.sv` - AXI-Stream top-level wrapper
+- `Itch_axi_stream_S00_AXI.v` - AXI-Lite register interface
+- `Itch_axi_stream_S00_AXIS.sv` - AXI-Stream slave interface
+- `tb_itch_axi_stream.sv` - Testbench for AXI interfaces
+
+**New decoders created (`rtl/modules/`):**
+- `add_order_mpid_decoder.v` - Add Order MPID decoder
+- `broken_trade_decoder.v` - Broken Trade decoder
+- `executed_price_decoder.v` - Executed with Price decoder
+
+**Modified existing files (`rtl/`):**
+- `parser.v` - Added arbitration logic for 3 new decoders
+- `integrated.v` - Updated integration with new decoders
+- `test_wrapper.v` - Refactored with new test cases
+
+**Modified decoder modules (`rtl/modules/`) - Single-process refactor for Vivado synthesis:**
+- `add_order_decoder.v`
+- `cancel_order_decoder.v`
+- `delete_order_decoder.v`
+- `executed_order_decoder.v`
+- `replace_order_decoder.v`
+- `trade_decoder.v`
+
+**Modified macros (`rtl/macros/`):**
+- `itch_len.vh` - Extended length function for new message types
+- `itch_suppression.vh` - Updated suppression logic
+- `field_macros/` - Added field definitions for new decoders
 
 ### PYNQ-Z2 FPGA Integration
 - Complete AXI4-Stream wrapper for DMA integration
