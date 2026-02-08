@@ -7,6 +7,13 @@ Electrical Engineering Student, Polytechnique Montréal
 Extended as part of INF8503 Design Project (Fall 2025)
 
 ---
+## Based on Original Work By
+
+**Ruixuan Zhang (Rex)**  
+Independent Researcher  
+ruixuan.zhang.ee@gmail.com
+
+---
 
 ## Overview
 
@@ -389,16 +396,6 @@ end
 
 ---
 
-## Original Work
-
-This project is based on the original ITCH parser implementation by:
-
-**Ruixuan Zhang (Rex)**  
-Independent Researcher  
-ruixuan.zhang.ee@gmail.com  
-rz0704rz@gmail.com
-
----
 
 ## License
 
