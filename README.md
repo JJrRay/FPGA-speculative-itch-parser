@@ -17,11 +17,11 @@ ruixuan.zhang.ee@gmail.com
 
 ## Overview
 
-This project implements a speculative, low-latency ITCH message parser with a robust, gated architecture that achieves canonical-format output with only **one clock cycle of parsing delay**. All message types are parsed in parallel using a fully macro-driven RTL structure, enabling aggressive pipelining and precise control.
+This project is based on the speculative ITCH parser architecture developed by [Ruixuan Zhang](https://www.techrxiv.org/users/924957/articles/1296717). The original design implements a low-latency ITCH message parser with a robust, gated architecture that achieves canonical-format output with only **one clock cycle of parsing delay**. All message types are parsed in parallel using a fully macro-driven RTL structure, enabling aggressive pipelining and precise control.
 
-The RTL modules are highly modular and reusable, with suppression logic, mid-packet recovery, and arbitration implemented through well-isolated macros. A matching Cocotb testbench framework—also macroized and helper-driven—provides full-cycle logging, field-level validation, and protocol-level benchmarking.
+This fork extends the original implementation with additional message type decoders, FPGA synthesis compatibility, and complete AXI integration for deployment on PYNQ-Z2.
 
-Thanks to this flexible and structured design, the parser architecture can be trivially adapted to support other streaming protocols with raw serial input and canonical parallel output—such as market data feeds, trading logic interfaces, or packetized control streams.
+The RTL modules are highly modular and reusable, with suppression logic, mid-packet recovery, and arbitration implemented through well-isolated macros. A matching Cocotb testbench framework provides full-cycle logging, field-level validation, and protocol-level benchmarking.
 
 ---
 
